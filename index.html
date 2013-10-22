@@ -17,6 +17,56 @@ a dining experience spanning Land, Sea and Soil. Now open daily for lunch and di
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
   <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js'></script>
   <script src='http://www.google.com/jsapi' type='text/javascript'></script>
+  <script>
+    var calendarService;
+    //var feedUrl = "https://www.google.com/calendar/feeds/elliot@infinitedigitalnow.com/public/full";
+    var feedUrl = "https://www.google.com/calendar/feeds/host@thegothicrestaurant.com/public/full";
+    var entries;
+    
+    function setupCalendarService() {
+      // Registered with Google Cloud API console by elliot at infinite digital now for use by the Gothic
+      calendarService = new google.gdata.calendar.CalendarService('BrowserKey-2013-10-16-0');
+    }
+    
+    function getEventsFeed() {
+      setupCalendarService();
+      var query = new google.gdata.calendar.CalendarEventQuery(feedUrl);
+      query.setOrderBy('starttime');
+      query.setSortOrder('ascending');
+      query.setFutureEvents(true);
+      query.setSingleEvents(true);
+      query.setMaxResults(3);
+      return calendarService.getEventsFeed(query, addEvents, null);
+    }
+    
+    var addEvents = function (resultsFeedRoot) {
+      //alert("This feed's title is: " + resultsFeedRoot.feed.getTitle().getText());
+      eventEntries = resultsFeedRoot.feed.getEntries();
+      entries = eventEntries;
+      for (var i = 0; i < eventEntries.length; i++) { 
+        var event = eventEntries[i];
+        var title = "" + event.getTitle().getText() + "";
+        var date = event.getTimes()[0].getStartTime().getDate();
+        uiDate = "" + $.datepicker.formatDate('MM d,', date) + "";
+        var description = "" + event.getContent().getText() + "";
+        var e = "" + title + uiDate + description + "";
+        $("#events_list").append(e);
+      }
+    };
+    
+    var handleClientLoad = function () {
+      // registered for the gothic restaurant
+      var apiKey = 'AIzaSyB5el3rwn_s9mMeSkW5UvtDu7DrqIt4qD8'; 
+      getEventsFeed();
+      // Had trouble getting the v3 calendar gdata apis working, so switched to another technique.
+      //gapi.client.setApiKey(apiKey);
+      //alert('got there');
+      //gapi.client.load('calendar', 'v3', function() { loadCalendarEvents(); });
+    };
+    
+    google.load("gdata", "1");
+    google.setOnLoadCallback(handleClientLoad);
+  </script>
   <script src='890714ed7e204aa52105a2977db8d59e.js'></script>
   <link rel="shortcut icon" href="favicon.ico">
 <link rel="shortcut icon" href="assets/images/icons/favicon.png">
